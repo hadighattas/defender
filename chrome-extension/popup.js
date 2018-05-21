@@ -9,6 +9,9 @@ function getLikes() {
     file: "socket.io.js"
   });
   chrome.tabs.executeScript({
+    file: "scroll.js"
+  });
+  chrome.tabs.executeScript({
     file: "likes.js"
   });
 }
@@ -27,6 +30,9 @@ function getTimelinePosts() {
     file: "socket.io.js"
   });
   chrome.tabs.executeScript({
+    file: "scroll.js"
+  });
+  chrome.tabs.executeScript({
     file: "timeline.js"
   });
 }
@@ -36,8 +42,14 @@ function analyzePosts() {
   chrome.tabs.executeScript({ file: "analyze.js" });
 }
 
-document.getElementById("shuffleButton").addEventListener("click", shufflePosts);
+document
+  .getElementById("shuffleButton")
+  .addEventListener("click", shufflePosts);
 document.getElementById("likesButton").addEventListener("click", getLikes);
 document.getElementById("20PostsButton").addEventListener("click", get20Posts);
-document.getElementById("timelinePostsButton").addEventListener("click", getTimelinePosts);
-document.getElementById("analyzeButton").addEventListener("click", analyzePosts);
+document
+  .getElementById("timelinePostsButton")
+  .addEventListener("click", getTimelinePosts);
+document
+  .getElementById("analyzeButton")
+  .addEventListener("click", analyzePosts);

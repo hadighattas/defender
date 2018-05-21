@@ -35,8 +35,8 @@ function shuffle(a) {
 }
 
 function createNewPosts(postsParents) {
-	var newPosts = [];
-	newPosts.push(document.createElement("div"));
+  var newPosts = [];
+  newPosts.push(document.createElement("div"));
   newPosts[0].innerHTML = postsParents[0].innerHTML;
   newPosts.push(document.createElement("div"));
   newPosts[1].innerHTML = postsParents[1].innerHTML;
@@ -44,17 +44,17 @@ function createNewPosts(postsParents) {
     newPosts.push(document.createElement("div"));
     newPosts[i + 2].innerHTML = postsParents[i + 2].childNodes[i % 5].outerHTML;
   }
-	
-	return newPosts;
+
+  return newPosts;
 }
 
-function logPostsSwapped(post1, post2) {
-	console.log(
-  postsIds.indexOf(post1.id),
-  post1.id,
-  " has been replaced by ",
-  postsIds.indexOf(post2.id),
-  post2.id
+function logPostsSwapped(post1, post2, postsIds) {
+  console.log(
+    postsIds.indexOf(post1.id),
+    post1.id,
+    " has been replaced by ",
+    postsIds.indexOf(post2.id),
+    post2.id
   );
 }
 
@@ -68,28 +68,33 @@ function action() {
   });
 
   var newPosts = createNewPosts(postsParents);
-  
+
   console.log("The old posts order is: ", newPosts);
 
   newPosts = shuffle(newPosts);
-	
+
   console.log("The new posts order: ", newPosts);
 
-	logPostsSwapped(postsParents[0].childNodes[0], newPosts[0].childNodes[0]);
-	postsParents[0].replaceWith(newPosts[0]);
-	
-	
-	logPostsSwapped(postsParents[1].childNodes[0], newPosts[1].childNodes[0]);
+  logPostsSwapped(
+    postsParents[0].childNodes[0],
+    newPosts[0].childNodes[0],
+    postsIds
+  );
+  postsParents[0].replaceWith(newPosts[0]);
+
+  logPostsSwapped(
+    postsParents[1].childNodes[0],
+    newPosts[1].childNodes[0],
+    postsIds
+  );
   postsParents[1].replaceWith(newPosts[1]);
-	
+
   for (var i = 0; i < postsParents.length - 2; i++) {
     var currentNode = postsParents[i + 2].childNodes[i % 5];
     var newNode = newPosts[i + 2].childNodes[0];
-		logPostsSwapped(currentNode, newNode);
+    logPostsSwapped(currentNode, newNode, postsIds);
     currentNode.replaceWith(newNode);
   }
 
   tempAlert("Done posts have been randomly reordered", 1000);
 }
-
-

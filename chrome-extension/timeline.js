@@ -1,55 +1,35 @@
 console.log("TimelinePostsScript");
-var timesScrolled = 0;
-var timer = setInterval(function() {
-  timesScrolled++;
-  window.scrollTo(0, document.body.scrollHeight);
-  if (timesScrolled > 20) {
-    clearInterval(timer);
-    window.scrollTo(0, 0);
-    var postsList = scrapePosts();
-    console.log(postsList);
-    sendPosts(postsList);
-  }
-}, 1000);
+scroll(5, scrapeTimelinePosts, sendTimelinePosts);
 
-function scrapePosts() {
+function addToList(post, postsList) {
+  var postText = post.childNodes[0].innerText;
+  postText.replace(/[^a-zA-Z0-9\!\?\(\)\\$<>\\/]/g, " ");
+  var str = postText;
+  if (str.replace(/[\s!?]/g, "").length) {
+    postsList.push({ post: postText });
+  }
+}
+
+function scrapeTimelinePosts() {
   var posts = document.querySelectorAll('[class^="_5pbx userContent _3576"]');
-  console.log(posts);
   var sharedPosts = document.querySelectorAll('[class^="mtm _5pco"]');
   var myPosts = document.querySelectorAll('[class^="_5_jv _58jw"]');
   var postsList = [];
   for (var i = 0; i < posts.length; i++) {
-    var post = posts[i].childNodes[0].innerText;
-    post.replace(/[^a-zA-Z0-9\!\?\(\)\\$<>\\/]/g, " ");
-    var str = post;
-    if (str.replace(/[\s!?]/g, "").length) {
-      postsList.push({ post: post });
-    }
+    addToList(posts[i], postsList);
   }
   for (i = 0; i < sharedPosts.length; i++) {
-    var sharedPost = sharedPosts[i].childNodes[0].innerText;
-    sharedPost.replace(/[^a-zA-Z0-9!\?\(\)\\$<>\\/]/g, " ");
-    var str = sharedPost;
-    if (str.replace(/[\s!?]/g, "").length) {
-      postsList.push({ post: sharedPost });
-    }
+    addToList(sharedPosts[i], postsList);
   }
   for (i = 0; i < myPosts.length; i++) {
-    var myPost = myPosts[i].childNodes[0].innerText;
-    myPost.replace(/[^a-zA-Z0-9!\?\(\)\\$<>\\/]/g, " ");
-    var str = myPost;
-    if (str.replace(/[\s!?]/g, "").length) {
-      postsList.push({ post: myPost });
-    }
+    addToList(myPosts[i], postsList);
   }
   return postsList;
 }
 
-function sendPosts(postsList) {
+function sendTimelinePosts(postsList) {
   var socket = io.connect("http://127.0.0.1:3000/");
   socket.on("welcome", function(data) {
-    // Respond with a message including this clients' id sent from the server
-    console.log("hi");
     socket.emit("posts", postsList);
   });
 
