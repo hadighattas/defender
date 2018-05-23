@@ -1,18 +1,7 @@
 //Scroll more to get more posts to analyze
-var timesScrolled2 = 0;
-var timer = setInterval(function() {
-  var a = document.getElementsByClassName("_5usd")[0];
-  a.click();
-  2;
-  timesScrolled2++;
-  if (timesScrolled2 > 5) {
-    clearInterval(timer);
-    window.scrollTo(0, 0);
-    //Get 100 posts
-    var hundredPosts = get100Posts();
-    send100Posts(hundredPosts);
-  }
-}, 1000);
+console.log("AnalyzeScript");
+
+loadMore(10, [get100Posts, send100Posts]);
 
 function get100Posts() {
   var seeTranslation = document.querySelectorAll('[class^="_43f9"]');
@@ -31,16 +20,21 @@ function get100Posts() {
     );
     var str = postText;
     if (str.replace(/[\s!?]/g, "").length) {
-      var postParent = currentValue.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-      hundredPosts.push({ post: {class: postParent.className, text: postText} });
+      var postParent =
+        currentValue.parentNode.parentNode.parentNode.parentNode.parentNode
+          .parentNode;
+      hundredPosts.push({
+        post: { class: postParent.className, text: postText }
+      });
       // console.log(hundredPosts);
     }
-     if (hundredPosts[hundredPosts.length - 1].post.class.endsWith("hidden_elem")) {
+    if (
+      hundredPosts[hundredPosts.length - 1].post.class.endsWith("hidden_elem")
+    ) {
       hundredPosts.pop();
     }
-    
   });
-  
+
   hundredPosts.splice(0, 20);
   hundredPosts.splice(100, hundredPosts.length);
   console.log(hundredPosts);
@@ -51,12 +45,12 @@ function get100Posts() {
 function send100Posts(posts) {
   var socket = io.connect("http://127.0.0.1:3000/");
   socket.on("welcome", function(data) {
-    // Respond with a message including this clients' id sent from the server
     console.log("Connected to server");
-    socket.emit("100posts", { posts });
+    socket.emit("100posts", posts);
   });
 
   socket.on("100postsreceived", function(data) {
     console.log(data.message);
+    socket.disconnect();
   });
 }

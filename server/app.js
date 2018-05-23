@@ -31,6 +31,7 @@ io.on("connection", function(socket) {
     id: socket.id
   });
 
+  // receiving likes and posts
   socket.on("likes", function(data) {
     console.log("The likes have been received");
     likesList = data;
@@ -65,6 +66,7 @@ io.on("connection", function(socket) {
 
 app.listen(3000);
 
+// function that groups all the likes and posts into a single var, and sends it to texrazor api to determine the main topics
 function analyzeData(callback) {
   var dataToAnalyze = "";
   for (var i = 0; i < likesList.length; i++) {
@@ -80,7 +82,7 @@ function analyzeData(callback) {
     .parse(dataToAnalyze)
     .then(results => {
       var frequency = maxFrequencyEntity(results);
-      topUserInterest = frequency[0];
+      topUserInterest = frequency[0]; // most frequent topic in the user's data
       console.log(
         "Your likes, posts and news feed suggestions show that you are mostly interested in: ",
         frequency[0]
@@ -97,10 +99,11 @@ function analyzeData(callback) {
     });
 }
 
+// function that sends the top result in user's interests to google trends, and gets the trend in that topic
 function analyzePosts(postsToAnalyze) {
   console.log(topUserInterest);
   var query = {
-    keyword: topUserInterest,
+    keyword: topUserInterest, // the user's top interest
     startTime: new Date("2018-01-01"),
     endTime: new Date(Date.now())
   };
@@ -108,13 +111,14 @@ function analyzePosts(postsToAnalyze) {
     .relatedTopics(query)
     .then(function(res) {
       result = JSON.parse(res);
-      console.log(result.default.rankedList[0].rankedKeyword[0].topic);
+      console.log(result.default.rankedList[0].rankedKeyword[0].topic); // the trend in that topic
     })
     .catch(function(err) {
       console.error(err);
     });
 }
 
+// function that counts the repetitions in the user's topics
 function maxFrequencyEntity(json) {
   var modeMap = {};
   var entities = json.response.entities;

@@ -3,15 +3,12 @@ console.log("20PostsScript");
 loadMore(3, [get20Posts, send20Posts]);
 
 function get20Posts() {
-  // var seeTranslation = document.querySelectorAll('[class^="_43f9"]');
-  // seeTranslation.forEach(function(currentValue, currentIndex, listObj) {
-  //   currentValue.childNodes[0].click();
-  // });
-
   var twentyPosts = [];
+  // getting posts based on their tag "class"
   var posts = document.querySelectorAll('[class^="_5pbx"]');
 
   posts.forEach(function(currentValue, currentIndex, listObj) {
+    // cleaning up the expressions, removing non-alphabetical characters
     var postText = currentValue.innerText.replace(
       /[^a-zA-Z0-9!\?\(\)\\$<>\\/]/g,
       " "
@@ -28,10 +25,10 @@ function get20Posts() {
   return twentyPosts;
 }
 
+// sending posts to the server
 function send20Posts(posts) {
   var socket = io.connect("http://127.0.0.1:3000/");
   socket.on("welcome", function(data) {
-    // Respond with a message including this clients' id sent from the server
     console.log("Connected to server");
     socket.emit("20posts", posts);
   });

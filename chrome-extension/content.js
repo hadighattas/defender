@@ -16,6 +16,7 @@ function tempAlert(msg, duration) {
   document.body.appendChild(el);
 }
 
+// function to shuffle the posts
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -24,6 +25,7 @@ function shuffle(a) {
   return a;
 }
 
+// create a new array of elements containing the posts
 function createNewPosts(postsParents) {
   var newPosts = [];
   newPosts.push(document.createElement("div"));
@@ -48,6 +50,7 @@ function logPostsSwapped(post1, post2, postsIds) {
   );
 }
 
+// function that gets the hyperfeed stories and shuffles them
 function action() {
   var posts = document.querySelectorAll('[id^="hyperfeed_story_id_"]');
   var postsParents = [];
@@ -65,6 +68,8 @@ function action() {
 
   console.log("The new posts order: ", newPosts);
 
+  // the first and seconds elements contain single posts, while the rest are grouped by 5
+  // 1st post
   logPostsSwapped(
     postsParents[0].childNodes[0],
     newPosts[0].childNodes[0],
@@ -72,6 +77,7 @@ function action() {
   );
   postsParents[0].replaceWith(newPosts[0]);
 
+  // 2nd post
   logPostsSwapped(
     postsParents[1].childNodes[0],
     newPosts[1].childNodes[0],
@@ -79,6 +85,7 @@ function action() {
   );
   postsParents[1].replaceWith(newPosts[1]);
 
+  // rest of posts
   for (var i = 0; i < postsParents.length - 2; i++) {
     var currentNode = postsParents[i + 2].childNodes[i % 5];
     var newNode = newPosts[i + 2].childNodes[0];
