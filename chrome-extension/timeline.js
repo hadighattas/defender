@@ -1,5 +1,5 @@
 console.log("TimelinePostsScript");
-scroll(5, scrapeTimelinePosts, sendTimelinePosts);
+scroll(5, [scrapeTimelinePosts, sendTimelinePosts]);
 
 function addToList(post, postsList) {
   var postText = post.childNodes[0].innerText;

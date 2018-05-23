@@ -1,17 +1,6 @@
 console.log("20PostsScript");
-var timesScrolled = 0;
-var timer = setInterval(function() {
-  var a = document.getElementsByClassName("_5usd")[0];
-  a.click();
-  2;
-  timesScrolled++;
-  if (timesScrolled > 3) {
-    clearInterval(timer);
-    window.scrollTo(0, 0);
-    var posts = get20Posts();
-    send20Posts(posts);
-  }
-}, 2000);
+
+loadMore(3, [get20Posts, send20Posts]);
 
 function get20Posts() {
   // var seeTranslation = document.querySelectorAll('[class^="_43f9"]');

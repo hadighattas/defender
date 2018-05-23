@@ -1,5 +1,5 @@
 console.log("LikesScript");
-scroll(10, scrapeLikes, sendLikes);
+scroll(10, [scrapeLikes, sendLikes]);
 
 function scrapeLikes() {
   var likes = document.querySelectorAll('[class^="fsl"]');

@@ -1,17 +1,7 @@
 console.log("ShufflingPostsScript");
 tempAlert("Fetching Posts", 2000);
 
-var timesScrolled = 0;
-var timer = setInterval(function() {
-  var a = document.getElementsByClassName("_5usd")[0];
-  a.click();
-  timesScrolled++;
-  if (timesScrolled > 2) {
-    clearInterval(timer);
-    window.scrollTo(0, 0);
-    action();
-  }
-}, 2000);
+loadMore(2, [action]);
 
 function tempAlert(msg, duration) {
   var el = document.createElement("div");

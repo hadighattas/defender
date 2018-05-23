@@ -1,5 +1,8 @@
 function shufflePosts() {
   chrome.tabs.executeScript({
+    file: "scroll.js"
+  });
+  chrome.tabs.executeScript({
     file: "content.js"
   });
 }
@@ -19,6 +22,9 @@ function getLikes() {
 function get20Posts() {
   chrome.tabs.executeScript({
     file: "socket.io.js"
+  });
+  chrome.tabs.executeScript({
+    file: "scroll.js"
   });
   chrome.tabs.executeScript({
     file: "20posts.js"
