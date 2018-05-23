@@ -3,6 +3,7 @@ var http = require("http"),
   request = require("request"),
   textrazorSdk = require("textrazor-sdk"),
   ParserSDK = require("textrazor-sdk/lib/Parser");
+googleTrends = require("google-trends-api");
 
 const textRazor = new textrazorSdk(
   "***REMOVED***"
@@ -15,17 +16,16 @@ var app = http.createServer(function(req, res) {
     "Content-Type": "text/html"
   });
 });
+
 var io = require("socket.io").listen(app);
 
 var likesList;
 var timelinePostsList;
 var twentyPostslist;
-var tba;
-
-// Socket.io server listens to our app
+var postsToAnalyze;
+var topUserInterest;
 
 io.on("connection", function(socket) {
-  // Use socket to communicate with this particular client only, sending it it's own id
   socket.emit("welcome", {
     message: "Welcome!",
     id: socket.id
@@ -50,7 +50,6 @@ io.on("connection", function(socket) {
   socket.on("20posts", function(data) {
     twentyPostslist = data;
     console.log("The first 20 timeline posts have been received");
-    console.log(twentyPostslist);
     socket.emit("20postsreceived", {
       message: "The first 20 posts have beeen successfully sent to the server"
     });
@@ -58,85 +57,63 @@ io.on("connection", function(socket) {
 
   socket.on("100posts", function(data) {
     console.log("The posts to be analyzed have been received");
-    tba = data;
-    analyzeData();
-    // analyzePosts(tba);
+    postsToAnalyze = data;
+    console.log("Posts to analyze: ", postsToAnalyze[0].post);
+    var userInterests = analyzeData(analyzePosts);
   });
 });
 
 app.listen(3000);
 
-function analyzeData() {
-  var likesString = "";
+function analyzeData(callback) {
+  var dataToAnalyze = "";
   for (var i = 0; i < likesList.length; i++) {
-    likesString += " " + likesList[i].like + " ";
+    dataToAnalyze += " " + likesList[i].like + ".\n";
+  }
+  for (var i = 0; i < timelinePostsList.length; i++) {
+    dataToAnalyze += " " + timelinePostsList[i].post + ".\n";
+  }
+  for (var i = 0; i < twentyPostslist.length; i++) {
+    dataToAnalyze += " " + twentyPostslist[i].post + ".\n";
   }
   textRazor.parser
-    .parse(likesString)
+    .parse(dataToAnalyze)
     .then(results => {
-      // toWrite = JSON.stringify(results);
-      // fs.writeFile("C:/Users/hadi_/Desktop/text.txt", toWrite, function(err) {
-      //   if (err) {
-      //     return console.log(err);
-      //   }
-      //   console.log("The file was saved!");
-      // });
       var frequency = maxFrequencyEntity(results);
+      topUserInterest = frequency[0];
       console.log(
-        "Your likes show that you are mostly interested in: ",
+        "Your likes, posts and news feed suggestions show that you are mostly interested in: ",
         frequency[0]
       );
-      console.log("Here is a comprehensive list of the topics you like: ");
+      console.log(
+        "Here is a comprehensive list of the topics you are interested in: "
+      );
       console.log(frequency[1]);
 
-      var timelineString = "";
-      for (var i = 0; i < timelinePostsList.length; i++) {
-        timelineString += " " + timelinePostsList[i].post + " ";
-      }
-      textRazor.parser
-        .parse(timelineString)
-        .then(results => {
-          var frequency = maxFrequencyEntity(results);
-          console.log(
-            "Your posts show that you are mostly interested in: ",
-            frequency[0]
-          );
-          console.log(
-            "Here is a comprehensive list of the topics you post about: "
-          );
-          console.log(frequency[1]);
-
-          var twentyPostsString = "";
-          for (var i = 0; i < twentyPostslist.length; i++) {
-            twentyPostsString += " " + twentyPostslist[i].post + " ";
-          }
-          textRazor.parser
-            .parse(twentyPostsString)
-            .then(results => {
-              var frequency = maxFrequencyEntity(results);
-              console.log(
-                "Your news feed shows that you are mostly interested in: ",
-                frequency[0]
-              );
-              console.log(
-                "Here is a comprehensive list of the topics facebook proposes to you: "
-              );
-              console.log(frequency[1]);
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      callback(postsToAnalyze);
     })
     .catch(err => {
       console.log(err);
     });
 }
 
-function analyzePosts() {}
+function analyzePosts(postsToAnalyze) {
+  console.log(topUserInterest);
+  var query = {
+    keyword: topUserInterest,
+    startTime: new Date("2018-01-01"),
+    endTime: new Date(Date.now())
+  };
+  googleTrends
+    .relatedTopics(query)
+    .then(function(res) {
+      result = JSON.parse(res);
+      console.log(result.default.rankedList[0].rankedKeyword[0].topic);
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}
 
 function maxFrequencyEntity(json) {
   var modeMap = {};
@@ -145,14 +122,7 @@ function maxFrequencyEntity(json) {
     maxCount = 1;
   for (var i = 0; i < entities.length; i++) {
     var el = entities[i].entityEnglishId;
-    if (
-      el == "" ||
-      el == "Translation" ||
-      el == "Hypertext Transfer Protocol" ||
-      el == "Netflix" ||
-      el == "Hogwarts"
-    )
-      continue;
+    if (el == "") continue;
     if (modeMap[el] == null) modeMap[el] = 1;
     else modeMap[el]++;
     if (modeMap[el] > maxCount) {
