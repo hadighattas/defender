@@ -14,6 +14,7 @@ function get20Posts() {
       " "
     );
     var str = postText;
+    // if post is not empty add it to list
     if (str.replace(/[\s!?]/g, "").length) {
       twentyPosts.push({ post: postText });
     }

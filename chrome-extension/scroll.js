@@ -1,3 +1,5 @@
+// function that scrolls a page to a certain depth
+// and then calls multiple callback functions
 function scroll(depth, callbackFunctions) {
   var timesToScroll = depth;
   var timer = setInterval(function() {
@@ -14,6 +16,8 @@ function scroll(depth, callbackFunctions) {
   }, 1000);
 }
 
+// function that simulates a click on the load more button
+// of the news feed and calls multiple callback functions
 function loadMore(depth, callbackFunctions) {
   var timesScrolled = depth;
   var timer = setInterval(function() {
