@@ -4,11 +4,10 @@ var http = require("http"),
   request = require("request"),
   textrazorSdk = require("textrazor-sdk"),
   ParserSDK = require("textrazor-sdk/lib/Parser"),
-  googleTrends = require("google-trends-api");
+  googleTrends = require("google-trends-api"),
+  config = require("./config");
 
-const textRazor = new textrazorSdk(
-  "***REMOVED***"
-);
+const textRazor = new textrazorSdk(config.textRazorKey);
 
 // instantiating the textrazor parser
 var parser = new ParserSDK();
